@@ -80,7 +80,7 @@ const getAllStates = async (req, res) => {
 // }
 
 //Get one from .json
-const getState = (req, res) => {
+const getState = async (req, res) => {
     const stateCode = req.params.state.toUpperCase();
     let statesData;
     
@@ -91,11 +91,27 @@ const getState = (req, res) => {
         console.error(err);
         return res.status(500).json({ 'message': err.message });
     }
+    
     const state = statesData.find(st => st.code === stateCode);
     if (!state) {
         return res.status(400).json({ "message": 'Invalid state abbreviation parameter' });
     }
-    return res.json(state);
+    const dbStates = await State.find();
+    // Convert MongoDB array to lookup object: { KS: ["...", "..."], CA: [...] }
+    const funFactMap = {};
+    dbStates.forEach(state => {
+        if (state.stateCode && state.funfacts) {
+            funFactMap[state.stateCode] = state.funfacts;
+        }
+    });
+    const facts = funFactMap[state.code];
+    // Merge funfacts to matching state in .json
+    const mergedStates = {
+        ...state,
+        ...(facts && { funfacts: facts }) // only include funfacts if exist
+      };
+    res.json(mergedStates);
+    // return res.json(state);
 }
 
 const getAllFunFacts = async (req, res) => {
