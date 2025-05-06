@@ -19,32 +19,97 @@ function getRandomElement(array) {
 }
 
 const getAllStates = async (req, res) => { 
-  try {
-    // Load JSON state data
-    // const filePath = path.join(__dirname, '../model/statesData.json');
     const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-    // Get all MongoDB fun fact entries
-    const dbStates = await State.find();
-    // Convert MongoDB array to lookup object: { KS: ["...", "..."], CA: [...] }
-    const funFactMap = {};
-    dbStates.forEach(state => {
-        if (state.stateCode && state.funfacts) {
-            funFactMap[state.stateCode] = state.funfacts;
+    let filteredStates = jsonData;
+    const contiguous = req.query.contig;
+    if (contiguous === 'true') {
+        try {
+            filteredStates = jsonData.filter(
+                state => state.code !== 'AK' && state.code !== 'HI'
+            );
+            // Load JSON state data
+            // const filePath = path.join(__dirname, '../model/statesData.json');
+            //// const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+            // Get all MongoDB fun fact entries
+            const dbStates = await State.find();
+            // Convert MongoDB array to lookup object: { KS: ["...", "..."], CA: [...] }
+            const funFactMap = {};
+            dbStates.forEach(state => {
+                if (state.stateCode && state.funfacts) {
+                    funFactMap[state.stateCode] = state.funfacts;
+                }
+            });
+            // Merge funfacts to matching state in .json
+            const mergedStates = filteredStates.map(state => {
+                const facts = funFactMap[state.code];
+                return {
+                ...state,
+                ...(facts && { funfacts: facts }) // only include funfacts if exist
+                };
+            });
+            res.json(mergedStates);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Server error' });
         }
-    });
-    // Merge funfacts to matching state in .json
-    const mergedStates = jsonData.map(state => {
-        const facts = funFactMap[state.code];
-        return {
-          ...state,
-          ...(facts && { funfacts: facts }) // only include funfacts if exist
-        };
-    });
-    res.json(mergedStates);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
-  }
+    } else if (contiguous === 'false') {
+        try {
+            filteredStates = jsonData.filter(
+                state => state.code === 'AK' || state.code === 'HI'
+            );
+            // Load JSON state data
+            // const filePath = path.join(__dirname, '../model/statesData.json');
+            // const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+            // Get all MongoDB fun fact entries
+            const dbStates = await State.find();
+            // Convert MongoDB array to lookup object: { KS: ["...", "..."], CA: [...] }
+            const funFactMap = {};
+            dbStates.forEach(state => {
+                if (state.stateCode && state.funfacts) {
+                    funFactMap[state.stateCode] = state.funfacts;
+                }
+            });
+            // Merge funfacts to matching state in .json
+            const mergedStates = filteredStates.map(state => {
+                const facts = funFactMap[state.code];
+                return {
+                ...state,
+                ...(facts && { funfacts: facts }) // only include funfacts if exist
+                };
+            });
+            res.json(mergedStates);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Server error' });
+        }
+    } else {
+        try {
+            // Load JSON state data
+            // const filePath = path.join(__dirname, '../model/statesData.json');
+            const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+            // Get all MongoDB fun fact entries
+            const dbStates = await State.find();
+            // Convert MongoDB array to lookup object: { KS: ["...", "..."], CA: [...] }
+            const funFactMap = {};
+            dbStates.forEach(state => {
+                if (state.stateCode && state.funfacts) {
+                    funFactMap[state.stateCode] = state.funfacts;
+                }
+            });
+            // Merge funfacts to matching state in .json
+            const mergedStates = jsonData.map(state => {
+                const facts = funFactMap[state.code];
+                return {
+                ...state,
+                ...(facts && { funfacts: facts }) // only include funfacts if exist
+                };
+            });
+            res.json(mergedStates);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Server error' });
+        }
+    }
 };
 
 //Create from .json,, maybe not needed?
@@ -98,13 +163,14 @@ const getState = async (req, res) => {
         statesData = JSON.parse(data);
         const stateDoc = await State.findOne({ stateCode: stateCode });
         const state = statesData.find(st => st.code === stateCode);
-        if (stateDoc && stateDoc.funfacts && stateDoc.funfacts.length > 0) {
-            state.funfacts = stateDoc.funfacts;
-            res.json(state);
-        }
         if (!state) {
             return res.status(400).json({ "message": 'Invalid state abbreviation parameter' });
         }
+        if (stateDoc && stateDoc.funfacts && stateDoc.funfacts.length > 0) {
+            state.funfacts = stateDoc.funfacts;
+        }
+        res.json(state);
+        
     } catch(err) {
         console.error(err);
         return res.status(500).json({ 'message': err.message });
