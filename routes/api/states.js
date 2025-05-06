@@ -16,6 +16,9 @@ router.route('/:state/funfact')
 router.route('/:state/funfact')
     .get(statesController.getFunFact);
 
+router.route('/:state/funfact')
+    .delete(statesController.deleteFunFact);
+
 router.route('/:state/capital')
     .get(statesController.getStateCapital);
 
@@ -24,7 +27,7 @@ router.route('/:state/nickname')
 
 router.route('/:state/population')
     .get(statesController.getStatePopulation);
-    
+
 router.route('/:state/admission')
     .get(statesController.getStateAdmission);
 

@@ -290,7 +290,7 @@ const createNewFunFact = async (req, res) => {
     //Url.com/states/:state<== the below grabs this value
     const stateCode = req.params.state.toUpperCase();
     const funfacts = req.body;
-    
+
     if (Object.keys(req.body).length === 0) {
         return res.status(400).json({ 'message': 'State fun facts value required'});
     }
@@ -318,6 +318,54 @@ const createNewFunFact = async (req, res) => {
     }
 }
 
+const deleteFunFact = async (req, res) => {
+    const stateCode = req.params.state.toUpperCase();
+    const index = req.body.index;
+
+    // Validate index provided
+    if (index === undefined) {
+        return res.status(400).json({ message: 'State fun fact index value required' });
+    }
+
+    // Validate state exists
+    const stateFromJson = rawJson.find(st => st.code === stateCode);
+    if (!stateFromJson) {
+        return res.status(400).json({ message: 'Invalid state abbreviation parameter' });
+    }
+
+    const stateName = stateFromJson.state;
+
+    try {
+        const stateDoc = await State.findOne({ stateCode: stateCode });
+
+        // No MongoDB doc for this state
+        if (!stateDoc || !Array.isArray(stateDoc.funfacts) || stateDoc.funfacts.length === 0) {
+            return res.status(404).json({ message: `No Fun Facts found for ${stateName}` });
+        }
+
+        const oneBasedIndex = parseInt(index);
+        const zeroBasedIndex = oneBasedIndex - 1;
+
+        // Index out of bounds
+        if (
+            isNaN(oneBasedIndex) ||
+            zeroBasedIndex < 0 ||
+            zeroBasedIndex >= stateDoc.funfacts.length
+        ) {
+            return res.status(404).json({ message: `No Fun Fact found at that index for ${stateName}` });
+        }
+
+        // Remove the fun fact at that index
+        stateDoc.funfacts.splice(zeroBasedIndex, 1);
+
+        const result = await stateDoc.save();
+        return res.json(result); // This will contain 4 properties: _id, stateCode, funfacts, __v
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Server error while deleting fun fact' });
+    }
+};
+
 const updateFunFact = async (req, res) => {
     if (!req?.body?.id) {
         return res.status(400).json({ 'message': 'ID parameter is required.' });
@@ -333,16 +381,16 @@ const updateFunFact = async (req, res) => {
     res.json(result);
 }
 
-const deleteFunFact = async (req, res) => {
-    if (!req?.body?.id) return res.status(400).json({ 'message': 'Employee ID required.' });
+// const deleteFunFact = async (req, res) => {
+//     if (!req?.body?.id) return res.status(400).json({ 'message': 'Employee ID required.' });
 
-    const employee = await Employee.findOne({ _id: req.body.id }).exec();
-    if (!employee) {
-        return res.status(204).json({ "message": `No employee matches ${req.body.id}.` });
-    }
-    const result = await employee.deleteOne({ _id: req.body.id });
-    res.json(result);
-}
+//     const employee = await Employee.findOne({ _id: req.body.id }).exec();
+//     if (!employee) {
+//         return res.status(204).json({ "message": `No employee matches ${req.body.id}.` });
+//     }
+//     const result = await employee.deleteOne({ _id: req.body.id });
+//     res.json(result);
+// }
 //This p[rolly sux idk]
 // const getFunFact = async (req, res) => {
 //     if (!req?.params?.id) return res.status(400).json({ 'message': 'Employee ID required.' });
