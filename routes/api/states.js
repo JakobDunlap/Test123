@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const statesController = require('../../controllers/statesController');
+const verifyStateCode = require('../../middleware/verifyStates');
 
 //dunno if this works, also might need to use getAllFunFacts
 router.route('/')
@@ -9,8 +10,8 @@ router.route('/')
     .put(statesController.updateFunFact)
     .delete(statesController.deleteFunFact);
 
-    //this is broken, needs fixing
+    //Currently verifystatecode is not working 
 router.route('/:state')
-    .get(statesController.getState);
+    .get(verifyStateCode, statesController.getState);
 
 module.exports = router;
