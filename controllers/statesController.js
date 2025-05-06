@@ -115,12 +115,11 @@ const getFunFact = async (req, res) => {
     const data = fs.readFileSync(filePath, 'utf-8');
     const statesData = JSON.parse(data);
     const state = statesData.find(st => st.code === stateCode);
-    const stateName = state.state;
     if (!state) return res.status(400).json({ 'message' : 'Invalid state abbreviation parameter' });
-
+    const stateName = state.state;
     
     const existingState = await State.findOne({ stateCode: stateCode });
-    if (!existingState) return res.status(200).json({ 'message' : `No fun facts found for ${stateName}` });
+    if (!existingState) return res.status(404).json({ 'message' : `No fun facts found for ${stateName}` });
 
     const randomFunFact = getRandomElement(existingState.funfacts);
 
