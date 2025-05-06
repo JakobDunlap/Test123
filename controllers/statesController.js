@@ -90,23 +90,31 @@ const getAllStates = async (req, res) => {
 // }
 
 //Get one from .json
-const getState = (req, res) => {
+const getState = async (req, res) => {
     //Url.com/states/:state<== the below grabs this value
     const stateCode = req.params.state.toUpperCase();
-    let statesData;
-    
     try {
         const data = fs.readFileSync(filePath, 'utf-8');
         statesData = JSON.parse(data);
+        const stateDoc = await State.findOne({ stateCode: stateCode });
+        const state = statesData.find(st => st.code === stateCode);
+        if (stateDoc && stateDoc.funfacts && stateDoc.funfacts.length > 0) {
+            state.funfacts = stateDoc.funfacts;
+            res.json(state);
+        }
+        if (!state) {
+            return res.status(400).json({ "message": 'Invalid state abbreviation parameter' });
+        }
     } catch(err) {
         console.error(err);
         return res.status(500).json({ 'message': err.message });
     }
-    const state = statesData.find(st => st.code === stateCode);
-    if (!state) {
-        return res.status(400).json({ "message": 'Invalid state abbreviation parameter' });
-    }
-    return res.json(state);
+    
+    
+    // if (!state) {
+    //     return res.status(400).json({ "message": 'Invalid state abbreviation parameter' });
+    // }
+    // return res.json(state);
 }
 
 const getFunFact = async (req, res) => {
@@ -118,8 +126,9 @@ const getFunFact = async (req, res) => {
     if (!state) return res.status(400).json({ 'message' : 'Invalid state abbreviation parameter' });
     const stateName = state.state;
     
+    //existingState is the doc in Mongodb that matches URL parameter stateCode
     const existingState = await State.findOne({ stateCode: stateCode });
-    if (!existingState) return res.status(404).json({ 'message' : `No fun facts found for ${stateName}` });
+    if (!existingState) return res.status(404).json({ 'message' : `No Fun Facts found for ${stateName}` });
 
     const randomFunFact = getRandomElement(existingState.funfacts);
 
