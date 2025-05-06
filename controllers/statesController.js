@@ -131,8 +131,11 @@ const createNewFunFact = async (req, res) => {
             const result = await existingState.save();
             return res.status(201).json(result);
         } else {
-            State.insertOne({ stateCode: stateCode, funfacts: funfacts});
-            return res.status(201).json({'message': 'lol sure'});
+            State.insertOne({ stateCode: stateCode, funfacts: funfacts})
+                .then(result => {
+                    res.status(201).json(result)
+                });
+            // return res.status(201).json({'message': 'lol sure'});
         }
     } catch (err) {
         console.error(err);
