@@ -13,6 +13,9 @@ router.route('/')
 router.route('/:state/funfact')
     .post(statesController.createNewFunFact);
 
+router.route('/:state/funfact')
+    .get(statesController.getFunFact);
+
     //Currently verifystatecode is not working 
 router.route('/:state')
     .get(statesController.getState);

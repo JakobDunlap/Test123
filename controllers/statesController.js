@@ -12,6 +12,11 @@ const data = {
     states: require('../model/statesData.json'),
     setStateData: function (data) { this.states = data }
 }
+//Get a random element for array
+function getRandomElement(array) {
+    const randomIndex = Math.floor(Math.random() * array.length);
+    return array[randomIndex];
+}
 
 const getAllStates = async (req, res) => { 
   try {
@@ -104,10 +109,22 @@ const getState = (req, res) => {
     return res.json(state);
 }
 
-const getAllFunFacts = async (req, res) => {
-    const employees = await Employee.find();
-    if (!employees) return res.status(204).json({ 'message' : 'No employees found.'});
-    res.json(employees);
+const getFunFact = async (req, res) => {
+    //Url.com/states/:state<== the below grabs this value
+    const stateCode = req.params.state.toUpperCase();
+    const data = fs.readFileSync(filePath, 'utf-8');
+    const statesData = JSON.parse(data);
+    const state = statesData.find(st => st.code === stateCode);
+    const stateName = state.state;
+    if (!state) return res.status(400).json({ 'message' : 'Invalid state abbreviation parameter' });
+
+    
+    const existingState = await State.findOne({ stateCode: stateCode });
+    if (!existingState) return res.status(200).json({ 'message' : `No fun facts found for ${stateName}` });
+
+    const randomFunFact = getRandomElement(existingState.funfacts);
+
+    res.json({ 'funfact': randomFunFact});
 }
 
 const createNewFunFact = async (req, res) => {
@@ -116,7 +133,7 @@ const createNewFunFact = async (req, res) => {
     const funfacts = req.body;
 
     //fix this
-    if (!funfacts) {
+    if (funfacts.length === 0) {
         return res.status(400).json({ 'message': 'State fun facts value required'});
     }
     if (!Array.isArray(funfacts)) {
@@ -129,9 +146,9 @@ const createNewFunFact = async (req, res) => {
         if (existingState) {
             existingState.funfacts = existingState.funfacts.concat(funfacts);
             const result = await existingState.save();
-            return res.status(201).json(result);
+            res.status(201).json(result);
         } else {
-            State.insertOne({ stateCode: stateCode, funfacts: funfacts})
+            const newFunFact = await State.insertOne({ stateCode: stateCode, funfacts: funfacts})
                 .then(result => {
                     res.status(201).json(result)
                 });
@@ -168,19 +185,19 @@ const deleteFunFact = async (req, res) => {
     const result = await employee.deleteOne({ _id: req.body.id });
     res.json(result);
 }
+//This p[rolly sux idk]
+// const getFunFact = async (req, res) => {
+//     if (!req?.params?.id) return res.status(400).json({ 'message': 'Employee ID required.' });
 
-const getFunFact = async (req, res) => {
-    if (!req?.params?.id) return res.status(400).json({ 'message': 'Employee ID required.' });
-
-    const employee = await Employee.findOne({ _id: req.params.id }).exec();
-    if (!employee) {
-        return res.status(204).json({ "message": `No employee matches ${req.params.id}.` });
-    }
-    res.json(employee);
-}
+//     const employee = await Employee.findOne({ _id: req.params.id }).exec();
+//     if (!employee) {
+//         return res.status(204).json({ "message": `No employee matches ${req.params.id}.` });
+//     }
+//     res.json(employee);
+// }
 
 module.exports = {
-    getAllFunFacts,
+    getFunFact,
     createNewFunFact,
     updateFunFact,
     deleteFunFact,
