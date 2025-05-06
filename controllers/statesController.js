@@ -4,14 +4,15 @@ const State = require('../model/State');
 const stateCodes = require('../middleware/verifyStates');
 const filePath = path.join(__dirname, '../model/statesData.json');
 //Bring in statesData.json as const 'data'
-// const data = {
-//     states: require('../model/statesData.json'),
-//     setStateData: function (data) { this.states = data }
-// }
+const data = {
+    states: require('../model/statesData.json'),
+    setStateData: function (data) { this.states = data }
+}
 
 const getAllStates = async (req, res) => { 
   try {
     // Load JSON state data
+    // const filePath = path.join(__dirname, '../model/statesData.json');
     const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
     // Get all MongoDB fun fact entries
     const dbStates = await State.find();
@@ -33,7 +34,7 @@ const getAllStates = async (req, res) => {
     res.json(mergedStates);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ 'message': err.message });
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
@@ -80,7 +81,7 @@ const getAllStates = async (req, res) => {
 // }
 
 //Get one from .json
-const getState = async (req, res) => {
+const getState = (req, res) => {
     const stateCode = req.params.state.toUpperCase();
     let statesData;
     
@@ -91,27 +92,11 @@ const getState = async (req, res) => {
         console.error(err);
         return res.status(500).json({ 'message': err.message });
     }
-    
     const state = statesData.find(st => st.code === stateCode);
     if (!state) {
         return res.status(400).json({ "message": 'Invalid state abbreviation parameter' });
     }
-    const dbStates = await State.find();
-    // Convert MongoDB array to lookup object: { KS: ["...", "..."], CA: [...] }
-    const funFactMap = {};
-    dbStates.forEach(state => {
-        if (state.stateCode && state.funfacts) {
-            funFactMap[state.stateCode] = state.funfacts;
-        }
-    });
-    const facts = funFactMap[state.code];
-    // Merge funfacts to matching state in .json
-    const mergedStates = {
-        ...state,
-        ...(facts && { funfacts: facts }) // only include funfacts if exist
-      };
-    res.json(mergedStates);
-    // return res.json(state);
+    return res.json(state);
 }
 
 const getAllFunFacts = async (req, res) => {

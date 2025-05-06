@@ -12,6 +12,6 @@ router.route('/')
 
     //Currently verifystatecode is not working 
 router.route('/:state')
-    .get(verifyStateCode, statesController.getState);
+    .get(statesController.getState);
 
 module.exports = router;
