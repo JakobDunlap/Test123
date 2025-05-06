@@ -115,9 +115,10 @@ const createNewFunFact = async (req, res) => {
     const stateCode = req.params.state.toUpperCase();
     const funfacts = req.body;
 
-    // if (!stateCode) {
-    //     return res.status(400).json({ 'message': 'State code required'});
-    // }
+    //fix this
+    if (!funfacts) {
+        return res.status(400).json({ 'message': 'State fun facts value required'});
+    }
     if (!Array.isArray(funfacts)) {
         return res.status(400).json({ 'message': 'State fun facts value must be an array' })
     }
@@ -129,6 +130,9 @@ const createNewFunFact = async (req, res) => {
             existingState.funfacts = existingState.funfacts.concat(funfacts);
             const result = await existingState.save();
             return res.status(201).json(result);
+        } else {
+            State.insertOne({ stateCode: stateCode, funfacts: funfacts});
+            return res.status(201).json({'message': 'lol sure'});
         }
     } catch (err) {
         console.error(err);
