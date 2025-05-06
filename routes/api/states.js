@@ -16,6 +16,18 @@ router.route('/:state/funfact')
 router.route('/:state/funfact')
     .get(statesController.getFunFact);
 
+router.route('/:state/capital')
+    .get(statesController.getStateCapital);
+
+router.route('/:state/nickname')
+    .get(statesController.getStateNickname);
+
+router.route('/:state/population')
+    .get(statesController.getStatePopulation);
+    
+router.route('/:state/admission')
+    .get(statesController.getStateAdmission);
+
     //Currently verifystatecode is not working 
 router.route('/:state')
     .get(statesController.getState);

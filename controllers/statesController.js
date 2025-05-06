@@ -17,6 +17,10 @@ function getRandomElement(array) {
     const randomIndex = Math.floor(Math.random() * array.length);
     return array[randomIndex];
 }
+//Format pop number with separating commas
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 
 const getAllStates = async (req, res) => { 
     const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
@@ -175,12 +179,93 @@ const getState = async (req, res) => {
         console.error(err);
         return res.status(500).json({ 'message': err.message });
     }
-    
-    
-    // if (!state) {
-    //     return res.status(400).json({ "message": 'Invalid state abbreviation parameter' });
-    // }
-    // return res.json(state);
+}
+
+const getStateCapital = async (req, res) => {
+    //Url.com/states/:state<== the below grabs this value
+    const stateCode = req.params.state.toUpperCase();
+    try {
+        const data = fs.readFileSync(filePath, 'utf-8');
+        statesData = JSON.parse(data);
+        const stateDoc = await State.findOne({ stateCode: stateCode });
+        const state = statesData.find(st => st.code === stateCode);
+        if (!state) {
+            return res.status(400).json({ "message": 'Invalid state abbreviation parameter' });
+        }
+        if (stateDoc && stateDoc.funfacts && stateDoc.funfacts.length > 0) {
+            state.funfacts = stateDoc.funfacts;
+        }
+        res.json({ 'state': state.state, 'capital': state.capital_city});
+        
+    } catch(err) {
+        console.error(err);
+        return res.status(500).json({ 'message': err.message });
+    }
+}
+
+const getStateNickname = async (req, res) => {
+    //Url.com/states/:state<== the below grabs this value
+    const stateCode = req.params.state.toUpperCase();
+    try {
+        const data = fs.readFileSync(filePath, 'utf-8');
+        statesData = JSON.parse(data);
+        const stateDoc = await State.findOne({ stateCode: stateCode });
+        const state = statesData.find(st => st.code === stateCode);
+        if (!state) {
+            return res.status(400).json({ "message": 'Invalid state abbreviation parameter' });
+        }
+        if (stateDoc && stateDoc.funfacts && stateDoc.funfacts.length > 0) {
+            state.funfacts = stateDoc.funfacts;
+        }
+        res.json({ 'state': state.state, 'nickname': state.nickname});
+        
+    } catch(err) {
+        console.error(err);
+        return res.status(500).json({ 'message': err.message });
+    }
+}
+
+const getStatePopulation = async (req, res) => {
+    //Url.com/states/:state<== the below grabs this value
+    const stateCode = req.params.state.toUpperCase();
+    try {
+        const data = fs.readFileSync(filePath, 'utf-8');
+        statesData = JSON.parse(data);
+        const stateDoc = await State.findOne({ stateCode: stateCode });
+        const state = statesData.find(st => st.code === stateCode);
+        if (!state) {
+            return res.status(400).json({ "message": 'Invalid state abbreviation parameter' });
+        }
+        if (stateDoc && stateDoc.funfacts && stateDoc.funfacts.length > 0) {
+            state.funfacts = stateDoc.funfacts;
+        }
+        const formattedPopulation = numberWithCommas(state.population);
+        res.json({ 'state': state.state, 'population': formattedPopulation});
+    } catch(err) {
+        console.error(err);
+        return res.status(500).json({ 'message': err.message });
+    }
+}
+
+const getStateAdmission = async (req, res) => {
+    //Url.com/states/:state<== the below grabs this value
+    const stateCode = req.params.state.toUpperCase();
+    try {
+        const data = fs.readFileSync(filePath, 'utf-8');
+        statesData = JSON.parse(data);
+        const stateDoc = await State.findOne({ stateCode: stateCode });
+        const state = statesData.find(st => st.code === stateCode);
+        if (!state) {
+            return res.status(400).json({ "message": 'Invalid state abbreviation parameter' });
+        }
+        if (stateDoc && stateDoc.funfacts && stateDoc.funfacts.length > 0) {
+            state.funfacts = stateDoc.funfacts;
+        }
+        res.json({ 'state': state.state, 'admitted': state.admission_date});
+    } catch(err) {
+        console.error(err);
+        return res.status(500).json({ 'message': err.message });
+    }
 }
 
 const getFunFact = async (req, res) => {
@@ -277,5 +362,9 @@ module.exports = {
     deleteFunFact,
     getFunFact,
     getAllStates,
-    getState
+    getState,
+    getStateCapital,
+    getStateNickname,
+    getStatePopulation,
+    getStateAdmission
 }
