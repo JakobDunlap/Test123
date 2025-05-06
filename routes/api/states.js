@@ -6,9 +6,12 @@ const verifyStateCode = require('../../middleware/verifyStates');
 //dunno if this works, also might need to use getAllFunFacts
 router.route('/')
     .get(statesController.getAllStates)
-    .post(statesController.createNewFunFact)
+    // .post(statesController.createNewFunFact)
     .put(statesController.updateFunFact)
     .delete(statesController.deleteFunFact);
+
+router.route('/:state/funfact')
+    .post(statesController.createNewFunFact);
 
     //Currently verifystatecode is not working 
 router.route('/:state')

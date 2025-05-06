@@ -40,7 +40,7 @@ app.use('/', require('./routes/root'));
 // app.use('/register', require('./routes/register')) <-- This is in "User Password Authentication" vid __ Maybe its a post method?--its for URL route www.blah.com/register for registering a new user
 app.use('/employees', require('./routes/api/employees')); //gets employees
 //FOR THE PROJ
-app.use('/states', require('./routes/api/states')); //gets stateData.json??
+app.use('/states', require('./routes/api/states')); 
 
 app.all('*', (req, res) => {
     res.status(404);

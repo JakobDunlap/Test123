@@ -1,8 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 const State = require('../model/State');
-const stateCodes = require('../middleware/verifyStates');
+// const stateCodes = require('../middleware/verifyStates');
 const filePath = path.join(__dirname, '../model/statesData.json');
+//Array of state codes in the .json
+const rawJson = require('../model/statesData.json');
+//For use with stateCodes below, using filePath instead does not work!
+const stateCodes = rawJson.map(state => state.code);
 //Bring in statesData.json as const 'data'
 const data = {
     states: require('../model/statesData.json'),
@@ -82,6 +86,7 @@ const getAllStates = async (req, res) => {
 
 //Get one from .json
 const getState = (req, res) => {
+    //Url.com/states/:state<== the below grabs this value
     const stateCode = req.params.state.toUpperCase();
     let statesData;
     
@@ -106,22 +111,24 @@ const getAllFunFacts = async (req, res) => {
 }
 
 const createNewFunFact = async (req, res) => {
-    const { stateCode, funfacts } = req.body;
+    //Url.com/states/:state<== the below grabs this value
+    const stateCode = req.params.state.toUpperCase();
+    const funfacts = req.body;
 
-    if (!stateCode) {
-        return res.status(400).json({ 'message': 'State code required'});
-    }
+    // if (!stateCode) {
+    //     return res.status(400).json({ 'message': 'State code required'});
+    // }
     if (!Array.isArray(funfacts)) {
         return res.status(400).json({ 'message': 'State fun facts value must be an array' })
     }
 
     try {
-        const existingState = await State.findOne({ stateCode: stateCode.toUpperCase() });
+        const existingState = await State.findOne({ stateCode: stateCode });
 
         if (existingState) {
             existingState.funfacts = existingState.funfacts.concat(funfacts);
             const result = await existingState.save();
-            return res.status(200).json(result); //maybe should be 201
+            return res.status(201).json(result);
         }
     } catch (err) {
         console.error(err);
