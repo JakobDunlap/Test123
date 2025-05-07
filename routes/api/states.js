@@ -31,6 +31,9 @@ router.route('/:state/population')
 router.route('/:state/admission')
     .get(statesController.getStateAdmission);
 
+router.route('/:state/funfact')
+    .patch(statesController.updateFunFact);
+
     //Currently verifystatecode is not working 
 router.route('/:state')
     .get(statesController.getState);

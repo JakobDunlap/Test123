@@ -367,19 +367,47 @@ const deleteFunFact = async (req, res) => {
 };
 
 const updateFunFact = async (req, res) => {
-    if (!req?.body?.id) {
-        return res.status(400).json({ 'message': 'ID parameter is required.' });
+    const stateCode = req.params.state.toUpperCase();
+    const { index, funfact } = req.body;
+
+    // Get the proper state name from static JSON
+    const stateName = rawJson.find(state => state.code === stateCode)?.state || stateCode;
+
+    // Validate index
+    if (index === undefined) {
+        return res.status(400).json({ message: 'State fun fact index value required' });
     }
 
-    const employee = await Employee.findOne({ _id: req.body.id }).exec();
-    if (!employee) {
-        return res.status(204).json({ "message": `No employee matches ${req.body.id}.` });
+    const parsedIndex = parseInt(index);
+    if (isNaN(parsedIndex) || parsedIndex < 1) {
+        return res.status(400).json({ message: 'State fun fact index value required' });
     }
-    if (req.body?.firstname) employee.firstname = req.body.firstname;
-    if (req.body?.lastname) employee.lastname = req.body.lastname;
-    const result = await employee.save();
-    res.json(result);
-}
+
+    // Validate funfact
+    if (!funfact || typeof funfact !== 'string') {
+        return res.status(400).json({ message: 'State fun fact value required' });
+    }
+
+    // Fetch from MongoDB
+    const stateDoc = await State.findOne({ stateCode });
+
+    if (!stateDoc || !Array.isArray(stateDoc.funfacts) || stateDoc.funfacts.length === 0) {
+        return res.status(404).json({ message: `No Fun Facts found for ${stateName}` });
+    }
+
+    const zeroBasedIndex = parsedIndex - 1;
+
+    if (zeroBasedIndex < 0 || zeroBasedIndex >= stateDoc.funfacts.length) {
+        return res.status(404).json({ message: `No Fun Fact found at that index for ${stateName}` });
+    }
+
+    // Perform the update
+    stateDoc.funfacts[zeroBasedIndex] = funfact;
+
+    const result = await stateDoc.save();
+
+    return res.json(result); // Includes _id, stateCode, funfacts, __v
+};
 
 // const deleteFunFact = async (req, res) => {
 //     if (!req?.body?.id) return res.status(400).json({ 'message': 'Employee ID required.' });
