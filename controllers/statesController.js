@@ -289,16 +289,13 @@ const getFunFact = async (req, res) => {
 const createNewFunFact = async (req, res) => {
     //Url.com/states/:state<== the below grabs this value
     const stateCode = req.params.state.toUpperCase();
-    const funfacts = req.body;
+    const funfacts = req.body.funfacts;
 
     if (Object.keys(req.body).length === 0) {
         return res.status(400).json({ 'message': 'State fun facts value required' });
     }
-    if (!Array.isArray(funfacts) && req.body.funfacts) {
-        return res.status(400).json({ 'message': 'State fun facts value must be an array' })
-    }
     if (!Array.isArray(funfacts)) {
-        return res.status(400).json({ 'message': 'State fun facts value required' })
+        return res.status(400).json({ 'message': 'State fun facts value must be an array' })
     }
 
     try {
