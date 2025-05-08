@@ -291,7 +291,14 @@ const createNewFunFact = async (req, res) => {
     const stateCode = req.params.state.toUpperCase();
     const funfacts = req.body.funfacts;
 
-    if (Object.keys(req.body).length === 0) {
+    // console.log(funfacts);
+    // const emptyarray = [];
+    // console.log(emptyarray);
+    // console.log(funfacts.length === 0);
+    if (!funfacts) {
+        return res.status(400).json({ 'message': 'State fun facts value required' });
+    }
+    if (funfacts.length === 0) {
         return res.status(400).json({ 'message': 'State fun facts value required' });
     }
     if (!Array.isArray(funfacts)) {
