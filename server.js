@@ -1,11 +1,11 @@
-// const dotenv = require('dotenv').config();
+const dotenv = require('dotenv').config();
 const express = require('express');
 const app = express();
-const path = require('path');
+const path = require('path'); //I think, needed only to access dummy database
 const cors = require('cors');
 const corsOptions = require('./config/corsOptions');
-// const { logger } = require('./middleware/logEvents');
-// const errorHandler = require('./middleware/errorHandler');
+const { logger } = require('./middleware/logEvents');
+const errorHandler = require('./middleware/errorHandler');
 //Might not be neccessary
 const credentials = require('./middleware/credentials');
 const mongoose = require('mongoose');
@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 3500;
 connectDB();
 
 // custom middleware logger
-// app.use(logger);
+app.use(logger);
 
 //Handle options credentials check - BEFORE CORS!
 //and fetch cookies credentials requirement---this comment in in the authentication vid, maybe it is not necessarily correct or applicable here?>
@@ -37,8 +37,8 @@ app.use('/', express.static(path.join(__dirname, '/public')));
 
 // routes
 app.use('/', require('./routes/root'));
-
-// app.use('/employees', require('./routes/api/employees'));
+// app.use('/register', require('./routes/register')) <-- This is in "User Password Authentication" vid __ Maybe its a post method?--its for URL route www.blah.com/register for registering a new user
+app.use('/employees', require('./routes/api/employees')); //gets employees
 //FOR THE PROJ
 app.use('/states', require('./routes/api/states')); 
 
