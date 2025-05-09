@@ -3,21 +3,23 @@ const router = express.Router();
 const statesController = require('../../controllers/statesController');
 const verifyStateCode = require('../../middleware/verifyStates');
 
-//dunno if this works, also might need to use getAllFunFacts
+//CHANGECHANGECHANGECHANGECHANGECHANGECHANGE
 router.route('/')
     .get(statesController.getAllStates)
-    // .post(statesController.createNewFunFact)
     .put(statesController.updateFunFact)
     .delete(statesController.deleteFunFact);
 
 router.route('/:state/funfact')
-    .post(statesController.createNewFunFact);
-
-router.route('/:state/funfact')
-    .get(statesController.getFunFact);
-
-router.route('/:state/funfact')
+    .post(statesController.createNewFunFact)
+    .get(statesController.getFunFact)
+    .patch(statesController.updateFunFact)
     .delete(statesController.deleteFunFact);
+
+// router.route('/:state/funfact')
+//     .get(statesController.getFunFact);
+
+// router.route('/:state/funfact')
+//     .delete(statesController.deleteFunFact);
 
 router.route('/:state/capital')
     .get(statesController.getStateCapital);
@@ -31,8 +33,8 @@ router.route('/:state/population')
 router.route('/:state/admission')
     .get(statesController.getStateAdmission);
 
-router.route('/:state/funfact')
-    .patch(statesController.updateFunFact);
+// router.route('/:state/funfact')
+//     .patch(statesController.updateFunFact);
 
     //Currently verifystatecode is not working 
 router.route('/:state')
