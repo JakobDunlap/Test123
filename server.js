@@ -4,10 +4,6 @@ const app = express();
 const path = require('path');
 const cors = require('cors');
 const corsOptions = require('./config/corsOptions');
-// const { logger } = require('./middleware/logEvents');
-// const errorHandler = require('./middleware/errorHandler');
-//Might not be neccessary
-const credentials = require('./middleware/credentials');
 const mongoose = require('mongoose');
 const connectDB = require('./config/dbConn');
 const stateCodes = require('./middleware/verifyStates');
@@ -15,13 +11,6 @@ const PORT = process.env.PORT || 3500;
 
 // Connect to db
 connectDB();
-
-// custom middleware logger
-// app.use(logger);
-
-//Handle options credentials check - BEFORE CORS!
-//and fetch cookies credentials requirement---this comment in in the authentication vid, maybe it is not necessarily correct or applicable here?>
-app.use(credentials);
 
 // Cross Origin Resource Sharing
 app.use(cors());
