@@ -30,10 +30,6 @@ const getAllStates = async (req, res) => {
             filteredStates = jsonData.filter(
                 state => state.code !== 'AK' && state.code !== 'HI'
             );
-            // Load JSON state data
-            // const filePath = path.join(__dirname, '../model/statesData.json');
-            //// const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-            // Get all MongoDB fun fact entries
             const dbStates = await State.find();
             // Convert MongoDB array to lookup object: { KS: ["...", "..."], CA: [...] }
             const funFactMap = {};
@@ -60,10 +56,6 @@ const getAllStates = async (req, res) => {
             filteredStates = jsonData.filter(
                 state => state.code === 'AK' || state.code === 'HI'
             );
-            // Load JSON state data
-            // const filePath = path.join(__dirname, '../model/statesData.json');
-            // const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-            // Get all MongoDB fun fact entries
             const dbStates = await State.find();
             // Convert MongoDB array to lookup object: { KS: ["...", "..."], CA: [...] }
             const funFactMap = {};
@@ -87,10 +79,7 @@ const getAllStates = async (req, res) => {
         }
     } else {
         try {
-            // Load JSON state data
-            // const filePath = path.join(__dirname, '../model/statesData.json');
             const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-            // Get all MongoDB fun fact entries
             const dbStates = await State.find();
             // Convert MongoDB array to lookup object: { KS: ["...", "..."], CA: [...] }
             const funFactMap = {};
