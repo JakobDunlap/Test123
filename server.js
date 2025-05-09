@@ -21,7 +21,7 @@ connectDB();
 
 //Handle options credentials check - BEFORE CORS!
 //and fetch cookies credentials requirement---this comment in in the authentication vid, maybe it is not necessarily correct or applicable here?>
-// app.use(credentials);
+app.use(credentials);
 
 // Cross Origin Resource Sharing
 app.use(cors());
