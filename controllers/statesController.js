@@ -105,8 +105,8 @@ const getAllStates = async (req, res) => {
 };
 
 const getState = async (req, res) => {
-    // Grabs two character state code
-    const stateCode = req.params.state.toUpperCase();
+    // // Grabs two character state code
+    // const stateCode = req.params.state.toUpperCase();
     try {
         const data = fs.readFileSync(filePath, 'utf-8');
         statesData = JSON.parse(data);
