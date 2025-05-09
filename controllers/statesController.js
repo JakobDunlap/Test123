@@ -1,23 +1,22 @@
 const fs = require('fs');
 const path = require('path');
 const State = require('../model/State');
-// const stateCodes = require('../middleware/verifyStates');
 const filePath = path.join(__dirname, '../model/statesData.json');
-//Array of state codes in the .json
+// Array of state codes in the .json file
 const rawJson = require('../model/statesData.json');
-//For use with stateCodes below, using filePath instead does not work!
+// For use with stateCodes below, using filePath instead does not work!
 const stateCodes = rawJson.map(state => state.code);
-//Bring in statesData.json as const 'data'
+// Bring in statesData.json as const 'data'
 const data = {
     states: require('../model/statesData.json'),
     setStateData: function (data) { this.states = data }
 }
-//Get a random element for array
+// Get a random element for any array
 function getRandomElement(array) {
     const randomIndex = Math.floor(Math.random() * array.length);
     return array[randomIndex];
 }
-//Format pop number with separating commas
+// Format pop. number with separating commas
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -116,51 +115,8 @@ const getAllStates = async (req, res) => {
     }
 };
 
-//Create from .json,, maybe not needed?
-// const createNewEmployee = (req, res) => {
-//     const newEmployee = {
-//         id: data.employees?.length ? data.employees[data.employees.length - 1].id + 1 : 1,
-//         firstname: req.body.firstname,
-//         lastname: req.body.lastname
-//     }
-
-
-//     if (!newEmployee.firstname || !newEmployee.lastname) {
-//         return res.status(400).json({ 'message': 'First and last names are required.' });
-//     }
-
-//     data.setEmployees([...data.employees, newEmployee]);
-//     res.status(201).json(data.employees);
-// }
-
-//Update from .json,, maybe not needed?
-// const updateEmployee = (req, res) => {
-//     const employee = data.employees.find(emp => emp.id === parseInt(req.body.id));
-//     if (!employee) {
-//         return res.status(400).json({ "message": `Employee ID ${req.body.id} not found` });
-//     }
-//     if (req.body.firstname) employee.firstname = req.body.firstname;
-//     if (req.body.lastname) employee.lastname = req.body.lastname;
-//     const filteredArray = data.employees.filter(emp => emp.id !== parseInt(req.body.id));
-//     const unsortedArray = [...filteredArray, employee];
-//     data.setEmployees(unsortedArray.sort((a, b) => a.id > b.id ? 1 : a.id < b.id ? -1 : 0));
-//     res.json(data.employees);
-// }
-
-//Delete from .json,, maybe not needed??
-// const deleteEmployee = (req, res) => {
-//     const employee = data.employees.find(emp => emp.id === parseInt(req.body.id));
-//     if (!employee) {
-//         return res.status(400).json({ "message": `Employee ID ${req.body.id} not found` });
-//     }
-//     const filteredArray = data.employees.filter(emp => emp.id !== parseInt(req.body.id));
-//     data.setEmployees([...filteredArray]);
-//     res.json(data.employees);
-// }
-
-//Get one from .json
 const getState = async (req, res) => {
-    //Url.com/states/:state<== the below grabs this value
+    // Grabs two character state code
     const stateCode = req.params.state.toUpperCase();
     try {
         const data = fs.readFileSync(filePath, 'utf-8');
@@ -174,7 +130,6 @@ const getState = async (req, res) => {
             state.funfacts = stateDoc.funfacts;
         }
         res.json(state);
-        
     } catch(err) {
         console.error(err);
         return res.status(500).json({ 'message': err.message });
@@ -182,7 +137,6 @@ const getState = async (req, res) => {
 }
 
 const getStateCapital = async (req, res) => {
-    //Url.com/states/:state<== the below grabs this value
     const stateCode = req.params.state.toUpperCase();
     try {
         const data = fs.readFileSync(filePath, 'utf-8');
@@ -204,7 +158,6 @@ const getStateCapital = async (req, res) => {
 }
 
 const getStateNickname = async (req, res) => {
-    //Url.com/states/:state<== the below grabs this value
     const stateCode = req.params.state.toUpperCase();
     try {
         const data = fs.readFileSync(filePath, 'utf-8');
@@ -218,7 +171,6 @@ const getStateNickname = async (req, res) => {
             state.funfacts = stateDoc.funfacts;
         }
         res.json({ 'state': state.state, 'nickname': state.nickname});
-        
     } catch(err) {
         console.error(err);
         return res.status(500).json({ 'message': err.message });
@@ -226,7 +178,6 @@ const getStateNickname = async (req, res) => {
 }
 
 const getStatePopulation = async (req, res) => {
-    //Url.com/states/:state<== the below grabs this value
     const stateCode = req.params.state.toUpperCase();
     try {
         const data = fs.readFileSync(filePath, 'utf-8');
@@ -248,7 +199,6 @@ const getStatePopulation = async (req, res) => {
 }
 
 const getStateAdmission = async (req, res) => {
-    //Url.com/states/:state<== the below grabs this value
     const stateCode = req.params.state.toUpperCase();
     try {
         const data = fs.readFileSync(filePath, 'utf-8');
@@ -269,15 +219,13 @@ const getStateAdmission = async (req, res) => {
 }
 
 const getFunFact = async (req, res) => {
-    //Url.com/states/:state<== the below grabs this value
     const stateCode = req.params.state.toUpperCase();
     const data = fs.readFileSync(filePath, 'utf-8');
     const statesData = JSON.parse(data);
     const state = statesData.find(st => st.code === stateCode);
     if (!state) return res.status(400).json({ 'message' : 'Invalid state abbreviation parameter' });
     const stateName = state.state;
-    
-    //existingState is the doc in Mongodb that matches URL parameter stateCode
+    // existingState is the document in Mongodb that matches URL parameter stateCode
     const existingState = await State.findOne({ stateCode: stateCode });
     if (!existingState) return res.status(404).json({ 'message' : `No Fun Facts found for ${stateName}` });
 
@@ -287,27 +235,22 @@ const getFunFact = async (req, res) => {
 }
 
 const createNewFunFact = async (req, res) => {
-    //Url.com/states/:state<== the below grabs this value
     const stateCode = req.params.state.toUpperCase();
     const funfacts = req.body.funfacts;
-
-    // console.log(funfacts);
-    // const emptyarray = [];
-    // console.log(emptyarray);
-    // console.log(funfacts.length === 0);
     if (!funfacts) {
+        // Request body has no funfacts property
         return res.status(400).json({ 'message': 'State fun facts value required' });
     }
     if (funfacts.length === 0) {
+        // Request body's funfacts property is empty
         return res.status(400).json({ 'message': 'State fun facts value required' });
     }
     if (!Array.isArray(funfacts)) {
+        // Request body's funfacts property does not have an array value attached
         return res.status(400).json({ 'message': 'State fun facts value must be an array' })
     }
-
     try {
         const existingState = await State.findOne({ stateCode: stateCode });
-
         if (existingState) {
             existingState.funfacts = existingState.funfacts.concat(funfacts);
             const result = await existingState.save();
@@ -317,7 +260,6 @@ const createNewFunFact = async (req, res) => {
                 .then(result => {
                     res.status(201).json(result)
                 });
-            // return res.status(201).json({'message': 'lol sure'});
         }
     } catch (err) {
         console.error(err);
@@ -328,45 +270,33 @@ const createNewFunFact = async (req, res) => {
 const deleteFunFact = async (req, res) => {
     const stateCode = req.params.state.toUpperCase();
     const index = req.body.index;
-
     // Validate index provided
     if (index === undefined) {
         return res.status(400).json({ message: 'State fun fact index value required' });
     }
-
     // Validate state exists
     const stateFromJson = rawJson.find(st => st.code === stateCode);
     if (!stateFromJson) {
         return res.status(400).json({ message: 'Invalid state abbreviation parameter' });
     }
-
     const stateName = stateFromJson.state;
-
     try {
         const stateDoc = await State.findOne({ stateCode: stateCode });
-
-        // No MongoDB doc for this state
+        // No MongoDB document for this state
         if (!stateDoc || !Array.isArray(stateDoc.funfacts) || stateDoc.funfacts.length === 0) {
             return res.status(404).json({ message: `No Fun Facts found for ${stateName}` });
         }
-
+        // Convert 1-based index provided in request body to 0-based for use in MongoDB
         const oneBasedIndex = parseInt(index);
         const zeroBasedIndex = oneBasedIndex - 1;
-
-        // Index out of bounds
-        if (
-            isNaN(oneBasedIndex) ||
-            zeroBasedIndex < 0 ||
-            zeroBasedIndex >= stateDoc.funfacts.length
-        ) {
+        // Index is out of bounds
+        if (isNaN(oneBasedIndex) || zeroBasedIndex < 0 || zeroBasedIndex >= stateDoc.funfacts.length) {
             return res.status(404).json({ message: `No Fun Fact found at that index for ${stateName}` });
         }
-
-        // Remove the fun fact at that index
+        // Remove the fun fact at given index
         stateDoc.funfacts.splice(zeroBasedIndex, 1);
-
         const result = await stateDoc.save();
-        return res.json(result); // This will contain 4 properties: _id, stateCode, funfacts, __v
+        return res.json(result);
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: 'Server error while deleting fun fact' });
@@ -376,66 +306,34 @@ const deleteFunFact = async (req, res) => {
 const updateFunFact = async (req, res) => {
     const stateCode = req.params.state.toUpperCase();
     const { index, funfact } = req.body;
-
     // Get the proper state name from static JSON
     const stateName = rawJson.find(state => state.code === stateCode)?.state || stateCode;
-
     // Validate index
     if (index === undefined) {
         return res.status(400).json({ message: 'State fun fact index value required' });
     }
-
     const parsedIndex = parseInt(index);
     if (isNaN(parsedIndex) || parsedIndex < 1) {
         return res.status(400).json({ message: 'State fun fact index value required' });
     }
-
     // Validate funfact
     if (!funfact || typeof funfact !== 'string') {
         return res.status(400).json({ message: 'State fun fact value required' });
     }
-
     // Fetch from MongoDB
     const stateDoc = await State.findOne({ stateCode });
-
     if (!stateDoc || !Array.isArray(stateDoc.funfacts) || stateDoc.funfacts.length === 0) {
         return res.status(404).json({ message: `No Fun Facts found for ${stateName}` });
     }
-
     const zeroBasedIndex = parsedIndex - 1;
-
     if (zeroBasedIndex < 0 || zeroBasedIndex >= stateDoc.funfacts.length) {
         return res.status(404).json({ message: `No Fun Fact found at that index for ${stateName}` });
     }
-
     // Perform the update
     stateDoc.funfacts[zeroBasedIndex] = funfact;
-
     const result = await stateDoc.save();
-
-    return res.json(result); // Includes _id, stateCode, funfacts, __v
+    return res.json(result);
 };
-
-// const deleteFunFact = async (req, res) => {
-//     if (!req?.body?.id) return res.status(400).json({ 'message': 'Employee ID required.' });
-
-//     const employee = await Employee.findOne({ _id: req.body.id }).exec();
-//     if (!employee) {
-//         return res.status(204).json({ "message": `No employee matches ${req.body.id}.` });
-//     }
-//     const result = await employee.deleteOne({ _id: req.body.id });
-//     res.json(result);
-// }
-//This p[rolly sux idk]
-// const getFunFact = async (req, res) => {
-//     if (!req?.params?.id) return res.status(400).json({ 'message': 'Employee ID required.' });
-
-//     const employee = await Employee.findOne({ _id: req.params.id }).exec();
-//     if (!employee) {
-//         return res.status(204).json({ "message": `No employee matches ${req.params.id}.` });
-//     }
-//     res.json(employee);
-// }
 
 module.exports = {
     getFunFact,
