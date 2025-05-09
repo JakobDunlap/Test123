@@ -5,7 +5,7 @@ const path = require('path');
 const cors = require('cors');
 const corsOptions = require('./config/corsOptions');
 // const { logger } = require('./middleware/logEvents');
-const errorHandler = require('./middleware/errorHandler');
+// const errorHandler = require('./middleware/errorHandler');
 //Might not be neccessary
 const credentials = require('./middleware/credentials');
 const mongoose = require('mongoose');
@@ -53,7 +53,7 @@ app.all('*', (req, res) => {
     }
 });
 
-app.use(errorHandler);
+// app.use(errorHandler);
 
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB');
