@@ -8,25 +8,25 @@ router.route('/', verifyStateCode)
     .put(statesController.updateFunFact)
     .delete(statesController.deleteFunFact);
 
-router.route('/:state')
+router.route('/:state', verifyStateCode)
     .get(statesController.getState);
 
-router.route('/:state/funfact')
+router.route('/:state/funfact', verifyStateCode)
     .post(statesController.createNewFunFact)
     .get(statesController.getFunFact)
     .patch(statesController.updateFunFact)
     .delete(statesController.deleteFunFact);
 
-router.route('/:state/capital')
+router.route('/:state/capital', verifyStateCode)
     .get(statesController.getStateCapital);
 
-router.route('/:state/nickname')
+router.route('/:state/nickname', verifyStateCode)
     .get(statesController.getStateNickname);
 
-router.route('/:state/population')
+router.route('/:state/population', verifyStateCode)
     .get(statesController.getStatePopulation);
 
-router.route('/:state/admission')
+router.route('/:state/admission', verifyStateCode)
     .get(statesController.getStateAdmission);
 
 module.exports = router;
