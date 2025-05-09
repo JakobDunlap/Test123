@@ -1,4 +1,4 @@
-// const dotenv = require('dotenv').config();
+const dotenv = require('dotenv').config();
 const express = require('express');
 const app = express();
 const path = require('path'); //I think, needed only to access dummy database
