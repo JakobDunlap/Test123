@@ -1,10 +1,10 @@
 const dotenv = require('dotenv').config();
 const express = require('express');
 const app = express();
-const path = require('path'); //I think, needed only to access dummy database
+const path = require('path');
 const cors = require('cors');
 const corsOptions = require('./config/corsOptions');
-const { logger } = require('./middleware/logEvents');
+// const { logger } = require('./middleware/logEvents');
 const errorHandler = require('./middleware/errorHandler');
 //Might not be neccessary
 const credentials = require('./middleware/credentials');
