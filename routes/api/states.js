@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const statesController = require('../../controllers/statesController');
 const verifyStateCode = require('../../middleware/verifyStates');
-const testCode = require('../../middleware/test')
+const testCode = require('../../middleware/test');
 
 router.route('/', verifyStateCode)
     .get(statesController.getAllStates)
